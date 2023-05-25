@@ -1,0 +1,110 @@
+Meeting scheduling
+
+The problem concerns planning a meeting among several participants. This can be viewed as a constraint satisfaction
+ problem where each participant has time constraints resulting from their calendar and preferences.
+ The problem is decentralized in nature, usually there is no arbitrary party that can facilitate the process of negotiation.
+ There are N agents among whom a meeting is to be set up. Each agent has a contact list for participants selection and
+ a calendar which is a set consisting of time slots when meetings could be scheduled (assume that calendar is finite -
+ bounded and enumerable, slot starts at full time and lasts for the multiplicity of 1 hour). Each slot has a preference
+ expressed as a number ∈ [0,1], the closer to 1 the more preferred the slot is for a meeting for the particular agent.
+ Agent's calendar is a private space, held by the agent and not known to the other agents. Ensure that the meeting is
+ always scheduled if there exists at least one available slot for all agents under consideration, maximize the global
+ preference (=sum of preferences of all agents for a given slot). The goal is to design and implement a protocol for
+ meeting scheduling according to the above. The protocol may take several steps to complete, each agent may send more
+ than one proposal at once. The intention is to imitate a natural process of meeting scheduling in a decentralized fashion.
+
+
+
+ Follow the guidelines:
+
+     identify agent types, | one type agents ScheduleAgent
+     identify agent responsibilities, | because of the decentralisation all have the same responsibilities
+     set the naming scheme, | ???
+     identify the interaction between agents, | yes
+     design the basic algorithm for the protocol, | yes
+     establish the content language, basic concepts and templates for message exchange, | yes
+     design agent behaviours based on identified interaction, algorithm and communication elements, | yes
+     implement the multi-agent system on the JADE platform. | yes
+
+ The process should be readable and understandable. Please, print out all the necessary information to visualize your process.
+ There is no need for UI elements, you can pass all your input data as program parameters and use STDOUT to show the results.
+
+
+
+
+ Class :
+ ScheduleAgent
+ args :
+
+ variables :
+ Private
+
+ Cool mais overthink
+ schedule  : Hashtable<int (years 20??), Hashtable>
+ year : Hashtable<int (month 1-12), Hashtable>
+ month : Hashtable<int (day 1-?), Hashtable>
+ day : Hashtable<int (hour 0-23), float (0-1)>
+
+ Solution taken
+ disponibilitiesHashtable : Hashtable<String (year-month-day-hour), float (0-1))
+
+ friends : List of string
+
+
+ message_content :
+ - list des participants | participantsList
+ - nombre de participant deja interroge | respondentNumber
+ - list des dispo avec leurs moyennes | averageDisponibilitiesList
+ - emeteur | meetingCreator
+
+    message form :
+    meetingCreator,respondentNumber,participantsList,averageDisponibilitiesList
+
+    averageDisponibilitiesHashtable : Hashtable<String (year-month-day-hour), float (average))
+
+
+ ScheduleGui (not dev)
+
+
+ On considere que tout le monde reponds
+
+ Explication
+
+first try
+
+ Definit la liste 0-1
+ Createur de reunion envoie sa liste de 1 au premier participant
+ Le participant supprime tous les dates qui ne sont pas des 1 pour lui
+    Si la liste est vide il en informe le createur (1)
+    Si la liste n'est pas vide il l'envoi au prochain participants (Le dernier participant revoie la liste au createur)
+ Le createur choisi un creneau dans la liste
+
+ (1)
+
+
+really working
+
+ L'emeteur definit une liste de personne et une liste de date
+ Envoi la liste de personne et la liste de date a une personne au hasard et le nom de l'emeteur de la reunion et le nombre de personne ayant repondu
+    Modification de la moyenne en fonction de sa liste de date et d'une nombre de personne ayant repondu
+    Supprime son nom de la liste et ajoute 1 au nombre de personne qui on repondu
+
+    Si la liste est vide renvoi a l'emeteur sinon envoi a une personne au hasard ...
+
+
+
+Division du travail
+
+Eliot
+- Composition / Decomposition du message
+- Creer date
+- Creer hashtable + attribution random float
+
+Pierre
+- Faire la communication entre les agents
+- copie colle nettoie agent
+- Fonction average = average(hashtable.get(horaire), tavaleur, respondentNumber) | dev pas verif
+
+
+A faire pour le prochain
+Algo case par case
