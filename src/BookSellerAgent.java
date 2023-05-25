@@ -13,6 +13,7 @@ import java.util.*;
 
 public class BookSellerAgent extends Agent {
   private Hashtable catalogue;
+  private boolean responding = true;
   private BookSellerGui myGui;
 
   protected void setup() {
@@ -52,67 +53,107 @@ public class BookSellerAgent extends Agent {
   }
 
   //invoked from GUI, when a new book is added to the catalogue
-  public void updateCatalogue(final String title, final int price) {
-    addBehaviour(new OneShotBehaviour() {
+  //public void updateCatalogue(final String title, final int price) {
+  public void updateCatalogue(final String title, final Hashtable infos) {
+	addBehaviour(new OneShotBehaviour() {
       public void action() {
-		catalogue.put(title, new Integer(price));
-		System.out.println(getAID().getLocalName() + ": " + title + " put into the catalogue. Price = " + price);
+		//catalogue.put(title, new Integer(price));
+		//  ArrayList()
+		catalogue.put(title, infos);
+		System.out.println(getAID().getLocalName() + ": " + title + " put into the catalogue. Price = " + infos.get("price") + " Shipping = " + infos.get("shipping"));
+		printCata();
       }
     } );
   }
   
 	private class OfferRequestsServer extends CyclicBehaviour {
 	  public void action() {
-	    //proposals only template
-		MessageTemplate mt = MessageTemplate.MatchPerformative(ACLMessage.CFP);
-		ACLMessage msg = myAgent.receive(mt);
-	    if (msg != null) {
-	      String title = msg.getContent();
-	      ACLMessage reply = msg.createReply();
-	      Integer price = (Integer) catalogue.get(title);
-	      if (price != null) {
-	        //title found in the catalogue, respond with its price as a proposal
-	        reply.setPerformative(ACLMessage.PROPOSE);
-	        reply.setContent(String.valueOf(price.intValue()));
-	      }
-	      else {
-	        //title not found in the catalogue
-	        reply.setPerformative(ACLMessage.REFUSE);
-	        reply.setContent("not-available");
-	      }
-	      myAgent.send(reply);
-	    }
-	    else {
-	      block();
-	    }
+		  //System.out.println(this.getAgent().getLocalName() + " avant");
+		  if(responding){
+			  //System.out.println(this.getAgent().getLocalName() + " apres");
+
+			  //proposals only template
+			  MessageTemplate mt = MessageTemplate.MatchPerformative(ACLMessage.CFP);
+			  ACLMessage msg = myAgent.receive(mt);
+			  if (msg != null) {
+				  String title = msg.getContent();
+				  ACLMessage reply = msg.createReply();
+
+				  Hashtable infos = (Hashtable) catalogue.get(title);
+
+				  if (infos!=null) {
+					  //title found in the catalogue, respond with its price as a proposal
+					  reply.setPerformative(ACLMessage.PROPOSE);
+					  reply.setContent(infos.toString());
+				  }
+				  else {
+					  //title not found in the catalogue
+					  reply.setPerformative(ACLMessage.REFUSE);
+					  reply.setContent("not-available");
+				  }
+				 myAgent.send(reply);
+			  }
+			  else {
+				  block();
+			  }
+		  } else {
+			  block();
+		  }
 	  }
 	}
 
 	
 	private class PurchaseOrdersServer extends CyclicBehaviour {
 	  public void action() {
-	    //purchase order as proposal acceptance only template
-		MessageTemplate mt = MessageTemplate.MatchPerformative(ACLMessage.ACCEPT_PROPOSAL);
-		ACLMessage msg = myAgent.receive(mt);
-	    if (msg != null) {
-	      String title = msg.getContent();
-	      ACLMessage reply = msg.createReply();
-	      Integer price = (Integer) catalogue.remove(title);
-	      if (price != null) {
-	        reply.setPerformative(ACLMessage.INFORM);
-	        System.out.println(getAID().getLocalName() + ": " + title + " sold to " + msg.getSender().getLocalName());
-	      }
-	      else {
-	        //title not found in the catalogue, sold to another agent in the meantime (after proposal submission)
-	        reply.setPerformative(ACLMessage.FAILURE);
-	        reply.setContent("not-available");
-	      }
-	      myAgent.send(reply);
-	    }
-	    else {
-		  block();
+			  //purchase order as proposal acceptance only template
+			MessageTemplate mt = MessageTemplate.MatchPerformative(ACLMessage.ACCEPT_PROPOSAL);
+			ACLMessage msg = myAgent.receive(mt);
+			if (msg != null) {
+			  String title = msg.getContent();
+			  ACLMessage reply = msg.createReply();
+			  //Integer price = (Integer) catalogue.remove(title);
+			  Hashtable<String, Integer>  infos = (Hashtable) catalogue.remove(title);
+			  if (infos != null) {
+				reply.setPerformative(ACLMessage.INFORM);
+				System.out.println(getAID().getLocalName() + ": " + title + " sold to " + msg.getSender().getLocalName());
+			  }
+			  else {
+				//title not found in the catalogue, sold to another agent in the meantime (after proposal submission)
+				reply.setPerformative(ACLMessage.FAILURE);
+				reply.setContent("not-available");
+			  }
+			  myAgent.send(reply);
+				printCata();
+			}
+			else {
+			  block();
+			}
 		}
 	  }
+
+	public void updateResponse(boolean b){
+		  this.responding = b;
+		  System.out.println(this.getLocalName() + " response = " + b);
+	}
+
+	public Hashtable convert(String s){
+		Hashtable ht = new Hashtable();
+
+		s = s.substring(1, s.length() -1);
+
+		String[] pairs = s.split(",");
+
+		for (String pair : pairs) {
+			String[] keyValue = pair.split("=");
+
+			ht.put(keyValue[0].trim(), keyValue[1].trim());
+		}
+
+		return ht;
+	}
+
+	public void printCata(){
+		System.out.println(this.getLocalName() + " : " + this.catalogue);
 	}
 
 }
