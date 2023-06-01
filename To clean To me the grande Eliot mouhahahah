@@ -1,0 +1,63 @@
+// Online Java Compiler
+// Use this editor to write, compile and run your Java code online
+
+import java.util.Hashtable;
+
+class HelloWorld {
+    public static void main(String[] args) {
+        
+        String date ="1111-22-33-44";
+        
+        Hashtable<String, Integer> result = new Hashtable<String, Integer>();
+        
+        result = dateToHastable(date);
+        
+        System.out.println("result1 : " + result);
+        
+        System.out.println("result2 : " + hashtableToDate(result));
+        
+        System.out.println("result3 : " + hashtableToDate(new Hashtable<String, Integer>()));
+    }
+    
+    private static String getNextNumber(StringBuilder sb){
+        String temp = "";
+        
+        if((sb.length() == 0) || (Character.isDigit(sb.charAt(0)) == false)){ // Error 
+            return null;
+        }
+        while ((sb.length() != 0) && Character.isDigit(sb.charAt(0))){
+            temp += sb.charAt(0);
+            sb.deleteCharAt(0);
+        }
+
+        while((sb.length() != 0) && sb.charAt(0) == '-'){
+            sb.deleteCharAt(0);
+        }
+        return temp;
+    }
+    
+    public static Hashtable<String, Integer> dateToHastable(String date){
+        // Works with a StringBuilder to be able to "modify" str in getNextNumber
+        
+        Hashtable<String, Integer> result = new Hashtable<String, Integer>();
+        StringBuilder sb = new StringBuilder();
+        sb.append(date);
+        
+        result.put("year", Integer.parseInt(getNextNumber(sb)));
+        result.put("month", Integer.parseInt(getNextNumber(sb)));
+        result.put("day", Integer.parseInt(getNextNumber(sb)));
+        result.put("hour", Integer.parseInt(getNextNumber(sb)));
+        
+        return result;
+    }
+    
+    public static String hashtableToDate(Hashtable<String, Integer> hashtable){
+        if(hashtable == null || hashtable.get("year") == null || hashtable.get("month") == null || hashtable.get("day") == null || hashtable.get("hour") == null){
+            return null;
+        }
+        String result = hashtable.get("year") + "-" + hashtable.get("month") + "-" + hashtable.get("day") + "-" + hashtable.get("hour");
+            return result;
+    }
+    
+    
+}
