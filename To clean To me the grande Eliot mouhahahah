@@ -61,3 +61,22 @@ class HelloWorld {
     
     
 }
+
+/*
+content = content.substring(1, content.length() - 1);
+
+				//Split the string by , to get key-value pairs
+				String[] keyValuePairs = content.split(",");
+
+				Hashtable<String, Integer> contentMap = new Hashtable();
+
+				//Iterate over the pairs
+				for (String pair : keyValuePairs)
+				{
+					//Split the pairs to get key and value
+					String[] entry = pair.split("=");
+
+					//Add them to the hashmap and trim whitespaces
+					contentMap.put(entry[0].trim(), Integer.parseInt(entry[1].trim()));
+				}
+*/
