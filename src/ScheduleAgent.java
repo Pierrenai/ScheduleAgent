@@ -91,6 +91,7 @@ public class ScheduleAgent extends Agent {
      */
     private class AppointmentEmiter extends Behaviour {
         //private List<String> participantsList = new ArrayList<>();
+        private AID meetingCreator = getAID();
         private String messageContent = "";
         private MessageTemplate mt;
         private int step = 0;
