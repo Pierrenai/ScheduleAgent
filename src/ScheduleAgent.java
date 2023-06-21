@@ -85,7 +85,6 @@ public class ScheduleAgent extends Agent {
     Emiting an appointment
      */
     private class AppointmentEmiter extends Behaviour {
-        private AID meetingCreator = getAID();
         //private List<String> participantsList = new ArrayList<>();
         private String messageContent = "";
         private MessageTemplate mt;
@@ -227,7 +226,7 @@ public class ScheduleAgent extends Agent {
 
                         message.addReceiver(new AID(randomFriend));
 
-                        // Removing the receiver from the list (because he doesn't need to send a verification to him self)
+                        // Removing the receiver from the list (because he doesn't need to send a verification to himself)
                         participantsList.remove(randomFriend);
 
                         // Add 1 to respondentNumber
@@ -236,7 +235,7 @@ public class ScheduleAgent extends Agent {
                         message.setContent(meetingCreator.getName() + "£" + respondentNumber + "£" + participantsList + "£" + averageDisponibilitiesList);
                     }
                     else {
-                        // Renvoi à l'envoyer
+                        // Retrun to the Appointment Performer
                         message = new ACLMessage(ACLMessage.PROPOSE);
                         message.addReceiver(meetingCreator);
 
