@@ -14,6 +14,11 @@ import jade.lang.acl.MessageTemplate;
 
 import java.util.*;
 
+/*
+/!\ If you want to make this agent work with others that don't have the same functionality,
+    you'll need to review the message verification system. (MessageTemplate)
+ */
+
 public class ScheduleAgent extends Agent {
 
     private List<String> friendsList = new ArrayList<>();
@@ -102,7 +107,7 @@ public class ScheduleAgent extends Agent {
                     ACLMessage message = new ACLMessage(ACLMessage.REQUEST);
 
                     // Removing the sender from the list
-                    participantsList.remove(this.getAgent().getAID());
+                    participantsList.remove(meetingCreator);
 
                     // Get random friends in list
                     String randomFriend = getRandomFromList(participantsList);
@@ -123,17 +128,17 @@ public class ScheduleAgent extends Agent {
 
                     // Creating the message
                     // Format : meetingCreator,respondentNumber,participantsList,averageDisponibilitiesList
-                    messageContent = this.getAgent().getName() + "£" + 0 + "£" + participantsList + "£" + ht;
+                    messageContent = meetingCreator.getName() + "£" + 0 + "£" + participantsList + "£" + ht;
                     //System.out.println("Message : " + messageContent);
 
                     message.setContent(messageContent);
-                    message.setConversationId("schedule-set");
                     myAgent.send(message);
 
                     step=1;
+                    break;
                 case 1:
                     // Waiting for appointment to be calculated
-                    MessageTemplate mt = MessageTemplate.MatchPerformative(ACLMessage.PROPOSE);
+                    mt = MessageTemplate.MatchPerformative(ACLMessage.PROPOSE);
 
                     // Receive a response
                     ACLMessage reply = myAgent.receive(mt);
@@ -156,8 +161,6 @@ public class ScheduleAgent extends Agent {
                         }
                         message = new ACLMessage(ACLMessage.INFORM);
 
-                        System.out.println(this.getAgent().getLocalName() + ", friendsList: " + friendsList);
-
                         for(int i=0; i<friendsList.size(); i++){
                             message.addReceiver(new AID(friendsList.get(i)));
                         }
@@ -168,6 +171,7 @@ public class ScheduleAgent extends Agent {
                     else {
                         block();
                     }
+                    break;
             }
         }
 
@@ -188,8 +192,7 @@ public class ScheduleAgent extends Agent {
                 ACLMessage received_msg = myAgent.receive(mt);
                 if (received_msg != null) {
                     String content = received_msg.getContent();
-                    Hashtable<String, Object> ht = new Hashtable<String, Object>();
-                    ht = contentToHashtable(content);
+                    Hashtable<String, Object> ht = contentToHashtable(content);
 
                     // Message decomposition
                     AID meetingCreator = new AID(ht.get("meetingCreator").toString());
@@ -239,7 +242,7 @@ public class ScheduleAgent extends Agent {
                         message = new ACLMessage(ACLMessage.PROPOSE);
                         message.addReceiver(meetingCreator);
 
-                        message.setContent(averageDisponibilitiesList + "");
+                        message.setContent(averageDisponibilitiesList.toString());
 
                         System.out.println("End of averaging");
                     }
