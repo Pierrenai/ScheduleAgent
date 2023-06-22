@@ -43,7 +43,7 @@ public class ScheduleAgent extends Agent {
         addBehaviour(new ScheduleAgent.AppointmentPerformer());
 
         ownDisponibilitiesList = ownDisponibilitiesListGeneretor();
-        //System.out.println(getAID().getLocalName() + ", ownDisponibilitiesList: " + ownDisponibilitiesList);
+        System.out.println(getAID().getLocalName() + ", ownDisponibilitiesList: " + ownDisponibilitiesList);
 
         Object[] args = getArguments();
         // if condition true the agent is the issuer of an appointment otherwise nothing happens
@@ -130,9 +130,11 @@ public class ScheduleAgent extends Agent {
                     // Creating the message
                     // Format : meetingCreator,respondentNumber,participantsList,averageDisponibilitiesList
                     messageContent = meetingCreator.getName() + "£" + 0 + "£" + participantsList + "£" + ht;
-                    //System.out.println("Message : " + messageContent);
+
 
                     message.setContent(messageContent);
+
+                    System.out.println(this.getAgent().getLocalName() + ", message : " + message);
                     myAgent.send(message);
 
                     step=1;
@@ -245,8 +247,9 @@ public class ScheduleAgent extends Agent {
 
                         message.setContent(averageDisponibilitiesList.toString());
 
-                        System.out.println("End of averaging");
+                        System.out.println(this.getAgent().getLocalName() + ", end of averaging");
                     }
+                    System.out.println(this.getAgent().getLocalName() + ", message : " + message);
                     myAgent.send(message);
                 }
                 else {
@@ -263,7 +266,7 @@ public class ScheduleAgent extends Agent {
             ACLMessage msg = myAgent.receive(mt);
             if (msg != null) {
                 String content = msg.getContent();
-                System.out.println(this.getAgent().getLocalName() + ", Appointment is on: " + content);
+                System.out.println(this.getAgent().getLocalName() + ", appointment is on: " + content);
             }
             else {
                 block();
@@ -303,7 +306,7 @@ public class ScheduleAgent extends Agent {
         Hashtable<String, Object> result = new Hashtable<String, Object>();
         String temp[] = content.split("£");
 
-        System.out.println(Arrays.toString(temp));
+        //System.out.println(Arrays.toString(temp));
 
         result.put("meetingCreator",  new AID(temp[0]).getName());
 
